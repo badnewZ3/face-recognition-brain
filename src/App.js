@@ -12,13 +12,13 @@ import './App.css';
 
 //You must add your own API key here from Clarifai.
 const app = new Clarifai.App({
- apiKey: 'YOUR_API_HERE'
+ apiKey: 'b0561f77366a4c53956ce8eea9bb7306'
 });
 
 const particlesOptions = {
   particles: {
     number: {
-      value: 30,
+      value: 90,
       density: {
         enable: true,
         value_area: 800
@@ -36,25 +36,10 @@ class App extends Component {
       box: {},
       route: 'signin',
       isSignedIn: false,
-      user: {
-        id: '',
-        name: '',
-        email: '',
-        entries: 0,
-        joined: ''
-      }
+     
     }
   }
 
-  loadUser = (data) => {
-    this.setState({user: {
-      id: data.id,
-      name: data.name,
-      email: data.email,
-      entries: data.entries,
-      joined: data.joined
-    }})
-  }
 
   calculateFaceLocation = (data) => {
     const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
@@ -82,8 +67,7 @@ class App extends Component {
     app.models
       .predict(
         // This part has been updated with the recent Clarifai changes. Used to be:
-        // .predict(Clarifai.FACE_DETECT_MODEL, ....)
-        'c0c0ac362b03416da06ab3fa36fb58e3',
+        Clarifai.FACE_DETECT_MODEL,
         this.state.input)
       .then(response => {
         if (response) {
@@ -91,13 +75,9 @@ class App extends Component {
             method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-              id: this.state.user.id
             })
           })
             .then(response => response.json())
-            .then(count => {
-              this.setState(Object.assign(this.state.user, { entries: count}))
-            })
 
         }
         this.displayFaceBox(this.calculateFaceLocation(response))
@@ -125,10 +105,7 @@ class App extends Component {
         { route === 'home'
           ? <div>
               <Logo />
-              <Rank
-                name={this.state.user.name}
-                entries={this.state.user.entries}
-              />
+              <Rank />
               <ImageLinkForm
                 onInputChange={this.onInputChange}
                 onButtonSubmit={this.onButtonSubmit}
@@ -137,8 +114,8 @@ class App extends Component {
             </div>
           : (
              route === 'signin'
-             ? <Signin loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
-             : <Register loadUser={this.loadUser} onRouteChange={this.onRouteChange}/>
+             ? <Signin  onRouteChange={this.onRouteChange}/>
+             : <Register  onRouteChange={this.onRouteChange}/>
             )
         }
       </div>
